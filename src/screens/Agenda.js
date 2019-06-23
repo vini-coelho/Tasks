@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ImageBackground, Text, FlatList } from 'react-native';
+import { View, StyleSheet, ImageBackground, Text, FlatList, StatusBar } from 'react-native';
 import moment from 'moment'
 import 'moment/locale/pt-br'
 import todayImage from '../../assets/images/today.jpg'
@@ -29,23 +29,38 @@ export default class Agenda extends Component {
         ]
     }
 
+    toggleTask = id => {
+        const tasks = [...this.state.tasks]
+
+        tasks.forEach(task => {
+            if (task.id === id) {
+                task.doneAt ? task.doneAt = null : task.doneAt = new Date()
+            } 
+        })
+
+        this.setState({ tasks });
+    }
+
     render() {
         return (
-            <View style={styles.container}>
-                <ImageBackground source={todayImage}
-                    style={styles.background}>
-                    <View style={styles.titleBar}>
-                        <Text style={styles.title}>Hoje</Text>
-                        <Text style={styles.subtitle}>
-                            {moment().locale('pt-br').format('ddd, D [de] MMMM')}
-                        </Text>
+            <>
+                <StatusBar translucent={true} backgroundColor='rgba(0,0,0,0)'/>
+                <View style={styles.container}>
+                    <ImageBackground source={todayImage}
+                        style={styles.background}>
+                        <View style={styles.titleBar}>
+                            <Text style={styles.title}>Hoje</Text>
+                            <Text style={styles.subtitle}>
+                                {moment().locale('pt-br').format('ddd, D [de] MMMM')}
+                            </Text>
+                        </View>
+                    </ImageBackground>
+                    <View style={styles.tasksContainer}>
+                        <FlatList data={this.state.tasks} keyExtractor={item => `${item.id}`}
+                            renderItem={({ item }) => <Task toggleTask={this.toggleTask}{...item}/>} />
                     </View>
-                </ImageBackground>
-                <View style={styles.tasksContainer}>
-                    <FlatList data={this.state.tasks} keyExtractor={item => `${item.id}`}
-                        renderItem={({ item }) => <Task {...item}/>} />
                 </View>
-            </View>
+            </>
         )
     }
 }
